@@ -7,13 +7,9 @@ vk_api = 'https://api.vk.com/method/'
 
 HELLO_MESSAGE = 'Hello! I am Sora, the Playlist Bot.\n' \
                 'If you wanna create playlist = write "/create" (I`ll help you)\n' \
-                'If you wanna edit your existing playlist -- GTFO, bitch!\n' \
                 'More features soon!'
 
 PLAYLIST_NAMING = 'Send me your playlist NAME.'
-PLAYLIST_CREATION = 'Send tracks to me. Then white me "/finish" and I`ll give your playlist.'
-
-GROUP_ID = 119252258
 
 
 def anti_flood(msg) -> str:
@@ -21,19 +17,14 @@ def anti_flood(msg) -> str:
 
 
 class Client:
-    last_request_time = 1
-
-    def __init__(self, token, audio_token):
+    def __init__(self, token, audio_token, group_id):
         self.token = token
         self.creator_token = audio_token
+        self.group_id = group_id
 
     def __request__(self, method, payload):
-        t = time.time() - self.last_request_time
-        if 0 < t < 0.34:
-            time.sleep(t)
-
+        time.sleep(0.34)
         r = requests.get(vk_api + method, params=payload)
-        self.last_request_time = time.time()
 
         if r.status_code != 200:
             print('Invalid request "' + method + '". code:', r.status_code, '\nval:', r.text)
@@ -77,7 +68,7 @@ class Client:
         p = {
             'access_token': self.creator_token,
             'title': name,
-            'group_id': GROUP_ID
+            'group_id': self.group_id
         }
         r = self.__request__('audio.addAlbum', p)
         if r is None:
@@ -91,7 +82,7 @@ class Client:
             'album_id': album_id,
             'audio_id': track_id,
             'owner_id': owner_id,
-            'group_id': GROUP_ID
+            'group_id': self.group_id
         }
 
         r = self.__request__('audio.add', p)

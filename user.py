@@ -8,7 +8,6 @@ class User:
         self.id = uid
         self.state = state
         self.tracks = []
-        self.playlist_name = ''
         self.pid = 1
 
     def change_state(self, new):

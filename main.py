@@ -4,7 +4,9 @@ import json
 
 f = open('token.json', 'r')
 tokens = json.loads(f.read())
-c = vk.Client(tokens['bot_token'], tokens['audio_token'])
+f.close()
+
+c = vk.Client(tokens['bot_token'], tokens['audio_token'], tokens['group_id'])
 
 users = {}
 
@@ -40,7 +42,6 @@ while True:
             pid = c.create_playlist(name)
 
             if pid is not None:
-                users[uid].playlist_name = name
                 users[uid].pid = pid
                 users[uid].change_state(user.STATE_PLAYLIST_ADD)
                 msg = 'Your playlist name is a <%s>. Send me tracks!' % name
@@ -68,11 +69,11 @@ while True:
 
                 if not failed:
                     msg = 'Thank you. Your playlist is here! https://vk.com/audios-%d?album_id=%d .' % \
-                          (vk.GROUP_ID, users[uid].pid)
+                          (tokens['group_id'], users[uid].pid)
                 else:
                     msg = 'Internal error! ' \
                           'Sorry. Anyway, you have %d tracks. Check https://vk.com/audios-%d?album_id=%d .' \
-                          % (users[uid].get_tracks_count(), vk.GROUP_ID, users[uid].pid)
+                          % (users[uid].get_tracks_count(), tokens['group_id'], users[uid].pid)
 
                 c.send_message(uid, msg)
                 try:
